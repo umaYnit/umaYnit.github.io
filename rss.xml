@@ -1,0 +1,826 @@
+<?xml version="1.0" encoding="utf-8"?><rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>袁式无语</title><link>https://umaYnit.github.io/</link><description>嗯，大概就这样吧</description><generator>Hugo 0.102.3 https://gohugo.io/</generator><language>zh-CN</language><managingEditor>umasensei@gmail.com (uma)</managingEditor><webMaster>umasensei@gmail.com (uma)</webMaster><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><lastBuildDate>Thu, 08 Sep 2022 15:24:52 +0800</lastBuildDate><atom:link rel="self" type="application/rss+xml" href="https://umaYnit.github.io/rss.xml"/><item><title>从百度云盘玩一玩前端操作</title><link>https://umaYnit.github.io/posts/%E4%BB%8E%E7%99%BE%E5%BA%A6%E4%BA%91%E7%9B%98%E7%8E%A9%E4%B8%80%E7%8E%A9%E5%89%8D%E7%AB%AF%E6%93%8D%E4%BD%9C/</link><guid isPermaLink="true">https://umaYnit.github.io/posts/%E4%BB%8E%E7%99%BE%E5%BA%A6%E4%BA%91%E7%9B%98%E7%8E%A9%E4%B8%80%E7%8E%A9%E5%89%8D%E7%AB%AF%E6%93%8D%E4%BD%9C/</guid><pubDate>Thu, 08 Sep 2022 00:20:49 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>起因是这样的，好早之前下载了一个学习视频，最近突然心血来潮想学习一下，等学到了第36个视频的时候，才发现视频没全部下载下来，本地只有49个。&lt;/p>
+&lt;p>于是去百度网盘上溜了一圈，找到了原资源，总共有116个视频。原本只需要简单的全选后下载即可，但是恰好b站最近又给我推了一抹多的什么硬盘损坏的视频，搞得我很紧张，想只下载缺失的部分。&lt;/p>
+&lt;p>然而事情可不会这么顺利，百度网盘的网页页面是真的难用，它在我点了十几个选择勾勾之后，突然一下子全清掉了，人都麻了。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_01.gif" alt="成年人的崩溃就在一瞬间">&lt;/p>
+&lt;p>成年人的崩溃就在一瞬间。&lt;/p>
+&lt;p>于是我就上头了，想要直接在这个页面，用代码自己去帮我点击选择要下载的视频。虽然我不会前端，但是说干就干。&lt;/p>
+&lt;p>首先查看这个框到底是个啥。本想着是个checkbox啥的，那就简单了。没想打开F12调试工具一看，居然是个span，而且选中和不选中，居然没有变化，怪了。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_02.png" alt="百度网盘的选中框居然是span">&lt;/p>
+&lt;p>终于，在试了好几次之后，才看到，变化的居然是更上级的dd，这个dd又是什么鬼东西。麻了，要不算了吧。但是一想到在朋友面前刚装的b，不能不做呀，但是又毫无头绪。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_03.png" alt="百度网盘选中框居然是dd">&lt;/p>
+&lt;p>只好再在F12里找找东西了。随便翻翻，发现在span上有好几个点击事件，右边还有一个Remove按钮，于是我就全都点了一下Remove。欸，页面上的选中框，点不动了，我好像又行了。但是为啥下面的点击事件都是一行，重复绑定了么？&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_04.png" alt="无意间找到了选中框的点击事件">&lt;/p>
+&lt;p>点进js source，点击的格式化，哦，来了来了，是源代码，打个断点试试。断点后，点击选中框，还是没有变化....破东西，不玩了。算了算了，，都到这步了（都浪费这么多时间了），再看看吧。&lt;/p>
+&lt;p>回到Elements的点击事件标签看，哦，哪路或多。原来不是重复绑定，不是同一个点击事件呀，是js压缩到一行了，好吧，那就每个都下个断点。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_05.png" alt="原来不是重复绑定的点击事件呀">&lt;/p>
+&lt;p>终于，在一番操作后，点击span，进入到断点了，我彷佛看到了胜利的曙光，有个可爱的天使在向我招手（来自半夜1点的发言）。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_06.png" alt="终于找到了选中框的点击事件">&lt;/p>
+&lt;p>找到了点击后调用的js了，然而我又陷入了迷茫，接下来该怎么办。突然又失去了头绪。&lt;/p>
+&lt;p>然后突然想起来，好像，可以直接触发元素的点击事件？赶紧试试。&lt;/p>
+&lt;p>给回到Elements页面，右键span，选择&lt;code>add attribute&lt;/code>，然后输入&lt;code>id=&amp;quot;aaaa&amp;quot;&lt;/code>，给span加上id。接下来切换到Console页面，熟练的在console里写上，&lt;code>document.getElementById(&amp;quot;aaaa&amp;quot;)&lt;/code>，回车，哦，有了。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_07.png" alt="在js里选中了span">&lt;/p>
+&lt;p>接下来就是赶紧查一查，怎么触发点击。直接打开搜索，输入“js 触发click”，进入第一个页面。有了，而且好像很简单的样子，赶紧复制下来试试。&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_08.png" alt="搜索出来的js触发click方法">&lt;/p>
+&lt;p>回到Console页面，输入&lt;code>document.getElementById(&amp;quot;aaaa&amp;quot;).click()&lt;/code>，回车确认，触发了断点，看来成功了，那么剩下的就都好说了。接下来，只需要选中所有的span，然后过滤出自己需要的，最后，触发他们的click事件就行了。&lt;/p>
+&lt;p>接下来的选中元素呀，啥的，过程就省略了，直接贴上代码。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-js" data-lang="js">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 查看过滤的情况
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">let&lt;/span> &lt;span class="nx">arr&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">[];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelectorAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;dd.g-clearfix&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">forEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">item&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">parseInt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">item&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;a&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">innerHTML&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">49&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">arr&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">item&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;a&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">innerHTML&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 选中过滤后的文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="nb">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelectorAll&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;dd.g-clearfix&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">forEach&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">item&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">parseInt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">item&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;a&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">innerHTML&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">slice&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">49&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nx">item&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">querySelector&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;span&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="nx">click&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;img src="https://umaYnit.github.io/img/baidu_09.png" alt="终于完成了目标，用js选中了想要的文件">&lt;/p>
+&lt;p>到这里，这个突发奇想的目标，就算达成了。虽然总共花了半个多小时，手动选可能最多就1，2分钟的时间，但是，我得到了快乐哈哈哈。&lt;/p></description><category domain="https://umaYnit.github.io/posts/">posts</category><category domain="https://umaYnit.github.io/tags/js/">Js</category><category domain="https://umaYnit.github.io/tags/web/">Web</category></item><item><title>随想03</title><link>https://umaYnit.github.io/slice/%E9%9A%8F%E6%83%B303/</link><guid isPermaLink="true">https://umaYnit.github.io/slice/%E9%9A%8F%E6%83%B303/</guid><pubDate>Sun, 10 Jan 2021 18:21:19 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;blockquote>
+&lt;p>语言这个东西，在翻译机器日渐进步的今天，感觉好像不用自己去掌握也没什么太大的问题，但实际上还有很太多因为语言而割裂开的事物。&lt;/p>
+&lt;/blockquote>
+&lt;p>昨天我给朋友讲，我感觉我比起身边的人，总能搜到他们搜不到的问题的答案，或者能够很快找到问题相关的资料。我仔细想了一下，大概有如下这些信息：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>1、简单的，常见的问题，无论是生活中的，还是技能向初级阶段的，总结来说，就是专业性不是那么强的，比较大众化的，能够直接在百度搜索，并且要带入自己是小白的视角，用相关的语气去搜，即尽量白话的形式，注意描述的要贴切。或者只输入出现的关键词，注意用空格隔开。&lt;/p>
+&lt;p>比如XXX入门，比如电脑出现了一些能够描述出现象的问题（出现莫名其妙的文件夹呀），再比如生活中的一些自己不太知道的方面突然想到的一些问题。&lt;/p>
+&lt;p>总的来说，可能需要一些练习（比如关键字的寻找，现象的描述，和该问题是否大众化的判断），然后就能很轻易的知道，怎么去查找。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>2、有语言及相关语言使用者偏向的，最好使用该语种去搜索，这时百度是多半不行的，要用谷歌。&lt;/p>
+&lt;p>这一个点，就是我这两天体会特别深刻的。前段时间，从一些公众号看到了书的安利，《30天自制操作系统》，这本书很久远了，是日本人写的，我最近想用Rust尝试去做这个（原书是作者自制汇编+C）。还没动手的时候，觉得好像还挺简单的，因为还知道一些&lt;a href="https://os.phil-opp.com/">Rust写操作系统的资料&lt;/a>，结果一开始就遇到了问题了：大部分的OS教程都跳过了引导程序的部分，直接使用了现有的完善的东西，而这样就和“30天”那个匹配不上。于是就尝试着从完整的那个部分，删除所有的东西，然后将“30天”的代码放进去，然后编译不过，提示 &lt;code>invalid instruction mnemonic 'xxx'&lt;/code>（无效的指令助记符，即汇编）。直接先是一波谷歌，明白了，有很多种不同类型的汇编，而这里使用从原本完整部分的代码里，得到了关键信息&lt;code>.intel_syntax noprefix&lt;/code>。我这里就凭借着自己的经验，直接拿该信息凭借空格再加上无效的指令后，去谷歌搜索（例如&lt;code>.intel_syntax noprefix db&lt;/code>）。经过一番努力后，终于把所有的错误都改正过来后，结果还是不行。这时我陷入了盲目的查找中（因为自己没有学过任何相关的东西），说来也是运气好，在翻了很多页之后，看到了一个有点特别的记录（有我要找的信息的对照），点进去一看，好家伙，是一个人尝试在Linux上玩“30天”（原书只提供了win的环境）。直接复制他的第一天的代码，终于成功了，很是激动。然而，到第二天的代码的时候，又出现问题了，他编写了ld脚本，并使用了额外的工具，但是一方面我是win环境，另一方面不太想用额外的工具。于是又开始盲目的搜索，这次就不行了，一方面，这个问题不能很简单的描述，另一方面比较小众。在我尝试了很多关键词都不行之后，在想求助老师的帮助的时候，突然间一个激灵，我切换到日语输入法使用了日语去搜索，关键词为 “30天自制操作系统 Rust”，一下子就出现了很多想要的信息。这个就是我题记里的感想，一是现代浏览器能自动的翻译到你能看得懂的语言，但目前搜索引擎没办法做这件事。二是我发现日文这边也有很多庞大的社区，在其中看到了很多特别有意思的东西，但是语言上的隔阂，让本来的&amp;quot;互联&amp;quot;的互联网变得像似一个一个孤岛一样。&lt;/p>
+&lt;/li>
+&lt;/ul></description><category domain="https://umaYnit.github.io/slice/">slice</category><category domain="https://umaYnit.github.io/tags/%E6%90%9C%E7%B4%A2/">搜索</category><category domain="https://umaYnit.github.io/tags/%E9%9A%8F%E6%83%B3/">随想</category></item><item><title>随想02</title><link>https://umaYnit.github.io/slice/%E9%9A%8F%E6%83%B302/</link><guid isPermaLink="true">https://umaYnit.github.io/slice/%E9%9A%8F%E6%83%B302/</guid><pubDate>Wed, 06 Jan 2021 17:52:16 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;blockquote>
+&lt;p>知识的诅咒（The Curse of Knowledge），即：我们一旦知道了某事，就无法想象这件事在未知者眼中的样子。当我们把自己知道的知识解释给别人的时候，因为信息的不对等，我们很难把自己知道的完完全全给对方解释清楚。总是，我们的知识“诅咒”了我们。&lt;/p>
+&lt;/blockquote>
+&lt;p>以前学日语的时候，总觉得先生讲的太怪了，我以后要是有机会给别人讲，我肯定要XXX这样讲这样做。后来等到自己学的差不多了，有了能够以助教的身份给入门的人讲内容的机会的时候，突然之间发现，自己忘记了以前到底想要怎么做，即上面的XXX现在在我的脑海里真的就是XXX。&lt;/p></description><category domain="https://umaYnit.github.io/slice/">slice</category><category domain="https://umaYnit.github.io/tags/%E7%9F%A5%E8%AF%86%E8%AF%85%E5%92%92/">知识诅咒</category><category domain="https://umaYnit.github.io/tags/%E9%9A%8F%E6%83%B3/">随想</category></item><item><title>随想01</title><link>https://umaYnit.github.io/slice/%E9%9A%8F%E6%83%B3/</link><guid isPermaLink="true">https://umaYnit.github.io/slice/%E9%9A%8F%E6%83%B3/</guid><pubDate>Mon, 04 Jan 2021 13:37:07 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>如何注意到那些特别细小的性能问题呢？这里的细小可能是对于我这种不懂的人来说的。印象最深的例子是很早之前看到(可能是这篇)的一个讲关于Disruptor里，有一个class里，在声明变量的时候，写了几个无用的变量（jdk8之后有新的注解&lt;code>@Contended&lt;/code>），而这几个变量对性能影响非常大（实际上就是cpu缓存的问题（缓存行对齐））。&lt;/p>
+&lt;p>黑盒、封装、缓存，这些技术将底层的事物抽象起来，让底层离我们非常远，可以非常简单的，从高层次入手，但是总会有一个阶段，你发现遇到瓶颈了，而这个瓶颈，不是自己这个层面的，是需要更往下走，去了解底下的事物，即&lt;strong>抽象泄露&lt;/strong>。&lt;/p>
+&lt;p>为什么会有这样的现象呢，是因为抽象并不能囊括所有的情况，所以那些偏向底层的人，非常不信任高层级的抽象。比如Rust的那些高级表达，真的没有开销吗？又比如关于缓存，一般情况下，是希望缓存对于外部来说是透明的，即不需要知道缓存的存在，但是类似上面的情况，在复杂的，性能敏感的时候，是不是又非得去关注这个点呢。&lt;/p>
+&lt;p>附一些相关文章：&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.cnblogs.com/cyfonly/p/5800758.html">伪共享（false sharing），并发编程无声的性能杀手&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://www.jianshu.com/p/648e9565969e?utm_campaign=hugo">聊聊CPU缓存、伪共享与缓存行填充&lt;/a>&lt;/li>
+&lt;/ul></description><category domain="https://umaYnit.github.io/slice/">slice</category><category domain="https://umaYnit.github.io/tags/%E6%80%A7%E8%83%BD/">性能</category><category domain="https://umaYnit.github.io/tags/%E9%9A%8F%E6%83%B3/">随想</category></item><item><title>Rust中Vec扩容时容量大小</title><link>https://umaYnit.github.io/posts/rust%E4%B8%ADvec%E6%89%A9%E5%AE%B9%E6%97%B6%E5%AE%B9%E9%87%8F%E5%A4%A7%E5%B0%8F/</link><guid isPermaLink="true">https://umaYnit.github.io/posts/rust%E4%B8%ADvec%E6%89%A9%E5%AE%B9%E6%97%B6%E5%AE%B9%E9%87%8F%E5%A4%A7%E5%B0%8F/</guid><pubDate>Sun, 20 Dec 2020 20:52:01 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;blockquote>
+&lt;p>有没有小伙伴拯救我，带我一起学习呀。&lt;/p>
+&lt;/blockquote>
+&lt;p>又是一个人的无聊的周末，打开极客时间，于是开始刷，养了很久的Rust视频课，第19节讲集合，在阅读doc文档时，有一部分提到了&lt;a href="https://doc.rust-lang.org/std/vec/struct.Vec.html#capacity-and-reallocation">Vec扩容的问题&lt;/a>。如下所示：&lt;/p>
+&lt;p>&lt;img src="https://umaYnit.github.io/img/vec_cap.png" alt="https://doc.rust-lang.org/std/vec/struct.Vec.html#capacity-and-reallocation">&lt;/p>
+&lt;p>视频中讲的是：&lt;/p>
+&lt;blockquote>
+&lt;p>容量是成倍增加，比如指定了一个容量为10的vec，那么扩容时会以10的倍数来自动增长，第一次扩容时就变成了20。&lt;/p>
+&lt;/blockquote>
+&lt;p>初一听好像确实没什么问题，和文档中说的一样。但是突然想到了，声明时指定容量的是方法&lt;code>with_capacity(usize)&lt;/code>，这时就是上面说的情况，但是使用&lt;code>new()&lt;/code>方法声明时并没有指定容量，那容量应该是多少呢？说到就打开ide，写出如下代码开始测试：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="k">fn&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">Vec&lt;/span>::&lt;span class="n">new&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">for&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">_&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">in&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="o">..&lt;/span>&lt;span class="mi">20&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">42&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="fm">dbg!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">capacity&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>截取部分打印结果，如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:5&lt;span class="o">]&lt;/span> vec.capacity&lt;span class="o">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">4&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:5&lt;span class="o">]&lt;/span> vec.capacity&lt;span class="o">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:5&lt;span class="o">]&lt;/span> vec.capacity&lt;span class="o">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">16&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:5&lt;span class="o">]&lt;/span> vec.capacity&lt;span class="o">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">32&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">...
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到，初始是4，后面以4为倍数开始增长。就很疑惑，这个4是哪里来的呢，emmm，去看看源码吧（大家一般可以先看源码，我比较菜，就忘记了）。&lt;/p>
+&lt;p>首先查看&lt;code>vec.capacity()&lt;/code>这个方法到底是在干什么。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//==========vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">capacity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="kt">usize&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">capacity&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">//==========raw_vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">capacity&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="kt">usize&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mem&lt;/span>::&lt;span class="n">size_of&lt;/span>::&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kt">usize&lt;/span>::&lt;span class="n">MAX&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">cap&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到，其实就是返回了结构体里的&lt;code>cap&lt;/code>字段，并没有更多的操作。然后查看&lt;code>new()&lt;/code>方法，看看有啥操作没：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//==========vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">const&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">new&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="nb">Vec&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nb">Vec&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">buf&lt;/span>: &lt;span class="nc">RawVec&lt;/span>::&lt;span class="n">NEW&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>: &lt;span class="mi">0&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">//==========raw_vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">const&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">NEW&lt;/span>: &lt;span class="nc">Self&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">Self&lt;/span>::&lt;span class="n">new&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">const&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">new&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="nc">Self&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="bp">Self&lt;/span>::&lt;span class="n">new_in&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Global&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">const&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">new_in&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">alloc&lt;/span>: &lt;span class="nc">A&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="nc">Self&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// `cap: 0` means &amp;#34;unallocated&amp;#34;. zero-sized types are ignored.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">Self&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">ptr&lt;/span>: &lt;span class="nc">Unique&lt;/span>::&lt;span class="n">dangling&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cap&lt;/span>: &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">alloc&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>发现还是没有任何操作，就是简单的设置了一下，在&lt;code>new()&lt;/code>方法里，&lt;code>cap&lt;/code>初始化就是0，没有出现任何和4这个数字有关系的代码。那相关代码只能在是&lt;code>push()&lt;/code>里了：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//==========vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">value&lt;/span>: &lt;span class="nc">T&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">capacity&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">..&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">//省略下面的操作代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里的&lt;code>reserve()&lt;/code>方法好像就是在做扩容，继续点进去查看，一路关键点下去：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//==========vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">buf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c1">//==========raw_vec.rs
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">handle_reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">try_reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>&lt;span class="p">));&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">try_reserve&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="nb">Result&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">TryReserveError&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">needs_to_grow&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">grow_amortized&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nb">Ok&lt;/span>&lt;span class="p">(())&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>最终，目光停留在了&lt;code>self.grow_amortized(len, additional)&lt;/code>这句代码上，内心感觉这里应该就是关键了：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">grow_amortized&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">additional&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="nb">Result&lt;/span>&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">(),&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">TryReserveError&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">..&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">//省略部分无关代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">required_cap&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">checked_add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">additional&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">ok_or&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CapacityOverflow&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">?&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cap&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cmp&lt;/span>::&lt;span class="n">max&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">cap&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">*&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">required_cap&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// Tiny Vecs are dumb. Skip to:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// - 8 if the element size is 1, because any heap allocators is likely
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// to round up a request of less than 8 bytes to at least 8 bytes.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// - 4 if elements are moderate-sized (&amp;lt;= 1 KiB).
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// - 1 otherwise, to avoid wasting too much space for very short Vecs.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">// Note that `min_non_zero_cap` is computed statically.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mem&lt;/span>::&lt;span class="n">size_of&lt;/span>::&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">T&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">min_non_zero_cap&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">==&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="mi">8&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;lt;=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1024&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="mi">4&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">else&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">};&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cap&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cmp&lt;/span>::&lt;span class="n">max&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">min_non_zero_cap&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">cap&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">..&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">//省略部分无关代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到，这里有这么大一段判断的代码，成倍增长是来自于&lt;code>cmp::max(self.cap * 2, required_cap)&lt;/code>，而初始大小则是下面那段&lt;code>if else&lt;/code>，这个总共分了三种情况：&lt;/p>
+&lt;ul>
+&lt;li>首先如果元素的大小是&lt;strong>1&lt;/strong>，则初始&lt;code>cap&lt;/code>给了&lt;strong>8&lt;/strong>，&lt;/li>
+&lt;li>否则如果元素的大小 小于等于&lt;strong>1024&lt;/strong>（即1Kb），则初始cap是&lt;strong>4&lt;/strong>，&lt;/li>
+&lt;li>最后，即元素大小大于&lt;strong>1024&lt;/strong>的情况，初始cap给了&lt;strong>1&lt;/strong>&lt;/li>
+&lt;/ul>
+&lt;p>所以上面最初的测试代码，因为数字42的默认类型是&lt;code>i32&lt;/code>，而&lt;code>i32&lt;/code>类型的大小是4，满足第二种情况，所以打印的初始值是4。&lt;/p>
+&lt;p>最后，测试一下第1，3种情况：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="k">fn&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">use&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">std&lt;/span>::&lt;span class="n">mem&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mem&lt;/span>::&lt;span class="n">size_of&lt;/span>::&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="kt">bool&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="fm">dbg!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">Vec&lt;/span>::&lt;span class="n">new&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">push&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="fm">dbg!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">capacity&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">mem&lt;/span>::&lt;span class="n">size_of&lt;/span>::&lt;span class="o">&amp;lt;&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="kt">bool&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1025&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">&amp;gt;&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="fm">dbg!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">elem_size&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="nb">Vec&lt;/span>::&lt;span class="n">new&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">push&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="p">;&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">1025&lt;/span>&lt;span class="p">]);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="fm">dbg!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">vec&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">capacity&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>运行结果如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:5&lt;span class="o">]&lt;/span> &lt;span class="nv">elem_size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:8&lt;span class="o">]&lt;/span> vec.capacity&lt;span class="o">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">8&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:11&lt;span class="o">]&lt;/span> &lt;span class="nv">elem_size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">1025&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">[&lt;/span>src&lt;span class="se">\m&lt;/span>ain.rs:14&lt;span class="o">]&lt;/span> vec.capacity&lt;span class="o">()&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="m">4&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>完美契合。&lt;/p>
+&lt;blockquote>
+&lt;p>嗯，这就样水了一篇博客，主要还是害怕自己如果不写下这些简单的，就难以去写那些复杂的，有意义的文章，终归还是要偿还上学时不写作文的债呀。&lt;/p>
+&lt;/blockquote></description><category domain="https://umaYnit.github.io/posts/">posts</category><category domain="https://umaYnit.github.io/tags/rust/">Rust</category><category domain="https://umaYnit.github.io/tags/vec/">Vec</category></item><item><title>RPG游戏相关突发感想</title><link>https://umaYnit.github.io/life/rpg%E6%B8%B8%E6%88%8F%E7%9B%B8%E5%85%B3%E7%AA%81%E5%8F%91%E6%84%9F%E6%83%B3/</link><guid isPermaLink="true">https://umaYnit.github.io/life/rpg%E6%B8%B8%E6%88%8F%E7%9B%B8%E5%85%B3%E7%AA%81%E5%8F%91%E6%84%9F%E6%83%B3/</guid><pubDate>Wed, 16 Dec 2020 12:02:49 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>今天在打车的路上的时候，突然有了一点关于RPG、GAL这样的剧情类的游戏的相关感想。&lt;/p>
+&lt;p>我没有玩过巫师3，但是昨天看了一个相关的视频，是主角在走到某个墙转角时，会有一个喜欢男主的女的突然出来壁咚他，然后视频的内容就是假如在触发剧情前，先用燃烧瓶丢墙壁会怎样。一般来说，这个取决于游戏是否有制作相关的判定，在这个游戏里，就出现了变化，行动变成了尾随，而判定条件是主角是否拿着武器，就是说其实和墙壁是否着火没有太大关系。&lt;/p>
+&lt;p>无论是最近非常火的2077，还是之前的巫师3，都有很多类似的会对剧情产生影响的选择，有些是显式的，比如对话时的选项，有些是隐式的，比如剧情触发前置条件。&lt;/p>
+&lt;p>早在高中时代，因为很喜欢key社的动漫，clannad、air、kanon，于是去收集相关信息，才知道这些动漫都是由游戏改编的，而这种类型的游戏，就叫galgame。当时记得花了好大的功夫才终于弄好了，可以在手机上游玩。&lt;/p>
+&lt;p>gal的中文好像是美少女游戏，游戏内容大概就是你作为其中的主角，然后有一个背景，和一些相关的角色，主体就是对话和选择。我还听过另一些称呼：视觉小说。（当然起初两者是不相同的，视觉小说更偏向于线性的没有选择的）。&lt;/p>
+&lt;p>我本身是一个“选择困难症”患者，在日常生活中经常难以做出选择，导致懒得做选择，上面花了好大劲弄的游戏，自然是没坚持过第五次出现的选项。然后我突然想到，现世人生其实不就是一个更复杂，或者说非常复杂的rpg游戏嘛，你做出的每一个动作都会对接下来的剧情（人生）产生影响。但是因为是一直持续着的，而且无法重复的。&lt;/p>
+&lt;p>然后还想到，现在的游戏虽然感觉挺多变的，不同的行为有不同的剧情不同的结局，但实际上这些都是提前设计好的，不同对话选项的不同反应，是固定好了的，不同数据值的不同影响，也是设计好了的，不同剧情的前置条件，就像是填表一样。即是能够在代码里看到，预测的，所以当前的开放世界游戏有时候玩起来无论如何都和现实有差距。那如果想做一个更接近的游戏，是不是应该重新去思考，怎么样才能更有现实感，譬如选项虽然是固定的，但是npc的反应是实时计算生成的（额，我写出来时才想到，既然相关联的事物是随机的，那选项肯定是设计不了的），这样，应该就和现实体验差不多吧，降低了选择的感觉。&lt;/p></description><category domain="https://umaYnit.github.io/life/">life</category><category domain="https://umaYnit.github.io/tags/whim/">Whim</category></item><item><title>吃药时的莫名想法</title><link>https://umaYnit.github.io/life/%E5%90%83%E8%8D%AF%E6%97%B6%E7%9A%84%E8%8E%AB%E5%90%8D%E6%83%B3%E6%B3%95/</link><guid isPermaLink="true">https://umaYnit.github.io/life/%E5%90%83%E8%8D%AF%E6%97%B6%E7%9A%84%E8%8E%AB%E5%90%8D%E6%83%B3%E6%B3%95/</guid><pubDate>Wed, 16 Dec 2020 12:02:49 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>天气太热起了疹子，去诊所开了药，红红绿绿的有一大把。&lt;/p>
+&lt;p>就着水，很 轻松的 一口就咽下去了，一点药的味道都没有留下。&lt;/p>
+&lt;p>回想起了小的时候，无论怎样尝试，都没办法“一口”。&lt;/p>
+&lt;p>最终褐色药片和糖衣化掉的白色药片的味道充斥着记忆。&lt;/p></description><category domain="https://umaYnit.github.io/life/">life</category><category domain="https://umaYnit.github.io/tags/whim/">Whim</category></item><item><title>Rust中panic的思考</title><link>https://umaYnit.github.io/posts/rust%E4%B8%ADpanic%E7%9A%84%E6%80%9D%E8%80%83/</link><guid isPermaLink="true">https://umaYnit.github.io/posts/rust%E4%B8%ADpanic%E7%9A%84%E6%80%9D%E8%80%83/</guid><pubDate>Tue, 15 Dec 2020 20:16:49 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>今天在Rust相关的群里看到一个问题&lt;/p>
+&lt;blockquote>
+&lt;p>A：怎么处理web服务中接口panic的？&lt;/p>
+&lt;/blockquote>
+&lt;p>我心想，Rust的强制错误处理在对比其他常用编程语言来说非常完善了，为啥会有panic呢？刚好就有人问出了我心中的这个问题。有如下对话：&lt;/p>
+&lt;blockquote>
+&lt;p>B：你的接口还会 panic ?
+A：一般来说不会panic ，以防万一。比如，你之前开发的时候有bug ，上线了没查到，结果你接口panic了。这是很有可能的。举个例子，例如这种代码，开发期间正常编译，上线了绝对panic。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">v&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="fm">vec!&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="mi">3&lt;/span>&lt;span class="p">];&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="n">v&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">6&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>B：所有根据索引操作的代码 和写 .unwrap() 没有区别呀。你会写 unwrap() 吗?&lt;/p>
+&lt;p>A：假设你就写了unwrap，但是没发现，要预防线上panic呀。你可以保证你自己不写panic ，人多了的情况下，很难保证所有人绝对不写panic&lt;/p>
+&lt;p>B：这样说好像不对, 真的代码质量这么差的话, 从提交代码的流程上就一定得有代码审核的过程。那要不然你还得防止 代码是不是有木马, 代码里有死循环, 代码里有任何东西都有可能&lt;/p>
+&lt;p>A：这是从管理上解决，问题是我们怎么从代码层面预防panic ，例如用了actix web的情况下&lt;/p>
+&lt;/blockquote>
+&lt;p>到这里我先去看了一下&lt;code>Vec&lt;/code>的&lt;code>remove&lt;/code>操作源码：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="k">pub&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="k">mut&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">index&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="nc">T&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="cp">#[cold]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="cp">#[inline(never)]&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">assert_failed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">index&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>: &lt;span class="kt">usize&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>-&amp;gt; &lt;span class="o">!&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="fm">panic!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;removal index (is {}) should be &amp;lt; len (is {})&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">if&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">&amp;gt;=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">assert_failed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">len&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="o">..&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c1">//后面操作部分省略
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到是因为一来就有一个&lt;code>assert_failed&lt;/code>函数，对长度&lt;code>len&lt;/code>进行了校验，如果失败，则直接&lt;code>panic&lt;/code>。&lt;/p>
+&lt;p>这里我首先想到的是Rust提供了捕获&lt;code>panic&lt;/code>的方法&lt;code>catch_unwind&lt;/code>，打开doc文档查看，发现好像是及其不推荐使用该方法的，而且还有可能捕获不到。&lt;/p>
+&lt;p>因为讨论的是web接口，于是我先去&lt;code>actix-web&lt;/code>的库查找相关的issue，还真有一个： &lt;a href="https://github.com/actix/actix-web/issues/1501">Panic within a handler should return an HTTP 500&lt;/a>。该issue是在讨论发生&lt;code>panic&lt;/code>时web框架应返回错误码500而不是直接就没有任何反应的断开连接。&lt;/p>
+&lt;p>在这个issue里，发起者提到了几种他认为的error级别的情况（例如数据库连接断开、数据库格式变化、上游服务器/API变化），他认为这些不应该一级一级向上传播，而是直接&lt;code>panic&lt;/code>掉（比如调用&lt;code>pool.get().await.unwrap()&lt;/code>从连接池获得连接时，如果得到了连接，那就ok，但是如果没有，这时无论如何做什么都会遭受灾难性的失败，因此需要&lt;code>panic&lt;/code>，并且也提到了采用&lt;code>catch_unwind&lt;/code>方法来捕获。&lt;/p>
+&lt;p>而库的现作者觉得，终止连接就是对&lt;code>panic&lt;/code>最恰当的相应，用户在写编写业务代码的时候应该在所有情况下进行处理或冒泡（向上传递），并且&lt;code>catch_unwind&lt;/code>也不等同于其他语言中的try-catch。&lt;/p>
+&lt;p>到这里，我其实是很认同库作者的发言的，我也觉得所有的错误都应该被处理掉，而不是当场产生&lt;code>panic&lt;/code>，再去捕获它，或者说不应该使用&lt;code>panic&lt;/code>做错误处理的流程。&lt;/p>
+&lt;p>所以就有了新的疑问，&lt;strong>为啥 Rust 标准库里的 Vec 集合的 remove 方法会产生 panic ，还没有其他的方法也是类似的， 在日常开发中怎样能够避免出现会 panic 的代码？&lt;/strong>&lt;/p>
+&lt;p>于是去rust的github仓库查询相关issue，刚好就又有一个相关的：&lt;a href="https://github.com/rust-lang/rust/pull/77480">Add &lt;code>try_remove&lt;/code> to &lt;code>Vec&lt;/code>&lt;/a>。这是一个pr，正如标题上所说，发起者添加了一个不会产生&lt;code>panic&lt;/code>的&lt;code>try_remove&lt;/code>方法，该方法的返回值是&lt;code>Option&amp;lt;T&amp;gt;&lt;/code>。照理说好像就没问题了，但是这个pr目前是关闭状态，继续往下看为什么。下面就有人回了，如果你要加这个，那就还应该增加&lt;code>try_&lt;/code>的类似的方法，例如&lt;code>try_swap_remove&lt;/code>，&lt;code>try_insert&lt;/code>，&lt;code>try_split_at&lt;/code>，不然就会很奇怪。&lt;/p>
+&lt;p>然后下面就开始讨论是否有必要做这些事情，比如因为索引前提很简单，所以用户应该自己检查，又比如应该避免多次检查等，这里因为个人能力有限，所以建议大家去看原文。&lt;/p>
+&lt;p>虽然最后没能得到肯定的答案，我有如下一些想法：&lt;/p>
+&lt;ul>
+&lt;li>标准库要怎样设计能够既清晰明了，又能在不使用unsafe的情况下（不手动做unsafe的事），满足所有的需求，比如索引越界检查，虽然有讲到llvm能够优化部分检查操作，但这样是不是就又是一种隐式的经验问题了：我需要知道这样写，代码才性能好，因为这样才能让编译器给我优化。&lt;/li>
+&lt;li>在工程中，能不能通过某些手段，去避免所有的会panic的代码。比如和panic相关的部分，交给最厉害的做，然后剩下的在提交代码做必须强制处理异常的检查。&lt;/li>
+&lt;/ul></description><category domain="https://umaYnit.github.io/posts/">posts</category><category domain="https://umaYnit.github.io/tags/rust/">Rust</category><category domain="https://umaYnit.github.io/tags/web/">Web</category></item><item><title>从Java的隐藏开销思考关于Rust零开销抽象的部分</title><link>https://umaYnit.github.io/posts/%E4%BB%8Ejava%E7%9A%84%E9%9A%90%E8%97%8F%E5%BC%80%E9%94%80%E6%80%9D%E8%80%83%E5%85%B3%E4%BA%8Erust%E9%9B%B6%E5%BC%80%E9%94%80%E6%8A%BD%E8%B1%A1%E7%9A%84%E9%83%A8%E5%88%86/</link><guid isPermaLink="true">https://umaYnit.github.io/posts/%E4%BB%8Ejava%E7%9A%84%E9%9A%90%E8%97%8F%E5%BC%80%E9%94%80%E6%80%9D%E8%80%83%E5%85%B3%E4%BA%8Erust%E9%9B%B6%E5%BC%80%E9%94%80%E6%8A%BD%E8%B1%A1%E7%9A%84%E9%83%A8%E5%88%86/</guid><pubDate>Mon, 19 Oct 2020 16:28:02 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>今天在翻某群历史消息的时候，看到有一篇关于Android的性能优化文章归档的博客，其中有一篇，叫&lt;a href="https://academy.realm.io/cn/posts/360andev-jake-wharton-java-hidden-costs-android/">探索Java隐藏的开销&lt;/a>。就从字节码和本地代码层面，以及各大App中的情况来探究了语言开销的问题。虽然文章更多的是以安卓的习惯和角度去探寻问题，但很多语言相关及分析思路上，是相通的。写到这里时，我突然又想到了kotlin，kotlin也是java字节码平台上的一种语言，那么它的实现也依赖于并受限于字节码和jvm提供的功能，是不是也会有相同的问题（见第二小点内容，嵌套类的实现）。&lt;/p>
+&lt;p>第一个小点，讲的是一个Java类中，隐藏（自动创建）的方法。如下代码所示，下面这段代码有多少个方法？&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>脑子里回想起学习Java基础的“每个类在没有显示声明构造方法时，都会隐式的有一个空参构造方法”。再想想其他的，好像没有了，遂回答：“一个”。&lt;/p>
+&lt;p>继续看文章，文章中编译到了&lt;code>dex&lt;/code>文件，使用&lt;code>dexdump&lt;/code>查看信息，打印出函数列表（&lt;code>method_ids_size &lt;/code>）为&lt;strong>2&lt;/strong>，有点出乎意料，猜想是否与继承有关（java的类都继承自Object）。使用&lt;code>javap&lt;/code>查看字节码信息，如下所示：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">javap&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">c&lt;/span> &lt;span class="n">Example&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">class&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Example&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Code&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">0&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">invokespecial&lt;/span> &lt;span class="err">#&lt;/span>&lt;span class="n">1&lt;/span> &lt;span class="c1">//java/lang/Object.&amp;#34;&amp;lt;init&amp;gt;&amp;#34;:()V
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">4&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;blockquote>
+&lt;p>在索引 1 处，是我们的对象构造函数，它被父类的构造函数调用。这是因为，即使我们不声明它，&lt;code>Example&lt;/code> 也是继承于 &lt;code>Object&lt;/code> 的。每一个构造函数都会调用它的父类的构造函数。它是自动插入的。这意味着我们的 class 流中有两个方法。
+所有这些关于我的初始问题的答案都是对的。区别就是术语不同。这是真实的情况。我们没有定义任何方法。但是只有人类关心它。作为人类，我们读写这些源文件。我们是唯一关心它们内部构造的人。另外两个方法更重要，方法的个数实际上是编译进 class 文件里面了。无论是否声明，这些方法都在 class 的内部。&lt;/p>
+&lt;/blockquote>
+&lt;p>上面这段是原文章的回答，目前我还不是很能理解第二个函数关于父类构造函数。我对题目的理解是该&lt;code>Example&lt;/code>类包含定义的方法，而父类构造方法是调用的部分，不知道为啥这里也被包含了进去。和同事讨论后，他的理解是，父类的方法是放在了子类的里面。所以回到了Java这里，继承到底是怎么实现的问题。之前也和他有凭感觉的猜想过，得出的结论是类似于大圆包含小圆，子类包含了父类。今天回想起来，感觉好像不是很对，于是手动尝试上面的实验。测试如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span> &lt;span class="kd">extends&lt;/span> &lt;span class="n">B&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span> &lt;span class="n">args&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">B&lt;/span> &lt;span class="kd">extends&lt;/span> &lt;span class="n">C&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">C&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里编写了3个类，Example、B和C，其中Example继承了B，B继承了C，除了因为需要打jar包的缘故，给Example类写了一个main方法外，都是没有写其他方法的。使用文章中提到的工具&lt;a href="https://github.com/JakeWharton/diffuse">&lt;code>dex-method-list&lt;/code>&lt;/a>，打印出详细信息，如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">java&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">jar&lt;/span> &lt;span class="n">diffuse&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">jar&lt;/span> &lt;span class="n">members&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">jar&lt;/span> &lt;span class="n">test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">jar&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">B&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="o">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">C&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="o">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Example&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="o">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Example&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">Object&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="o">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到，总共有5个方法，分别是Example类、B类和C类的构造方法，main 方法和一个Object的构造方法。到这里，可以得出，之前和同事猜想的结论是错误的，属于瞎猜。然后这里主要的疑问点，其实是&lt;code>dexdump&lt;/code>工具这里的&lt;code>method_ids_size&lt;/code>计数，到底是指哪一部分的问题。所以又写了如下来进行测试：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span> &lt;span class="n">args&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">String&lt;/span> &lt;span class="n">_s&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">String&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">valueOf&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">42&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">javac&lt;/span> &lt;span class="n">Example&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">java&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">dx&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">dex&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">output&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="n">example&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">dex&lt;/span> &lt;span class="n">Example&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">class&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">dexdump&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">f&lt;/span> &lt;span class="n">example&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">dex&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">method_ids_size&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="n">4&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">...&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">java&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">jar&lt;/span> &lt;span class="n">diffuse&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">jar&lt;/span> &lt;span class="n">members&lt;/span> &lt;span class="o">--&lt;/span>&lt;span class="n">jar&lt;/span> &lt;span class="n">test&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">jar&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Example&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="o">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Example&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">Object&lt;/span> &lt;span class="o">&amp;lt;&lt;/span>&lt;span class="n">init&lt;/span>&lt;span class="o">&amp;gt;()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">String&lt;/span> &lt;span class="nf">valueOf&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="err">→&lt;/span> &lt;span class="n">String&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>所以&lt;code>dexdump&lt;/code>方法统计的应该是所有包含的方法的数量，类似于方法表一样。另一方面，子类初始化时，不会实例化父类。说到初始化，这里简单回顾一下：&lt;/p>
+&lt;p>首先Java的类通过new关键字和构造方法来实例化，这里构造方法其实应该翻译为构造器(&lt;code>constructor &lt;/code>)比较好，因为它实际上和Java里的方法并不一样。&lt;/p>
+&lt;p>1、在概念层面，方法属于Java的类成员，而构造器不属于。构造器和方法是平等的概念，而不是包含（Filed：成员变量、Method：普通方法、Type：内部定义的其他类型，如内部接口、内部类等），&lt;/p>
+&lt;p>2、在虚拟机层面构造器使用&lt;code>invokespecial&lt;/code>指令执行，而方法使用&lt;code>invokevirtual&lt;/code>指令执行。&lt;/p>
+&lt;blockquote>
+&lt;p>Constructors, static initializers, and instance initializers are not members and therefore are not inherited. ---- &lt;a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.2">8.2 Class Memebers章节&lt;/a>
+构造方法，静态初始化器，对象初始化器，都不是类的成员，因此它们也不可以被子类继承。&lt;/p>
+&lt;p>a constructor declaration looks just like a method declaration that has no result... ---- &lt;a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.8">8.8 Constructor Declarations 章节&lt;/a>
+一个 constructor 的定义就像是一个没有返回值的 method 的定义。&lt;/p>
+&lt;/blockquote>
+&lt;p>说到这里，有一些相关的题目：“Java的构造方法到底有还是没有返回值？”、“Java中的构造方法是方法吗？”。现在这些问题大家心里就有自己的见解了吧。&lt;/p>
+&lt;p>然后&lt;/p>
+&lt;p>上面说的Java关于new一个对象的侧重点是由这篇文章衍生的部分，是围绕文章相关来的，所以其中还有更多的细节，例如对象的访问定位问题、类加载过程等，大家可以自己去更深入的了解学习。相信下面这类题目，已经完全没有难度了：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Father&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">private&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">5&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="nf">Father&lt;/span>&lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">System&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s">&amp;#34;Father&amp;#39;s i is &amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">i&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">test&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="o">(){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">System&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">i&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">1&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Son&lt;/span> &lt;span class="kd">extends&lt;/span> &lt;span class="n">Father&lt;/span>&lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">private&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">55&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="nf">Son&lt;/span>&lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">System&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s">&amp;#34;Son&amp;#39;s i is &amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">i&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nd">@Override&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">test&lt;/span>&lt;span class="o">()&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">System&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">out&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">println&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">i&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">1&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">String&lt;/span>&lt;span class="o">[]&lt;/span> &lt;span class="n">args&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">new&lt;/span> &lt;span class="n">Son&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>在上面查找资料的过程中，还有另一个有意思的问题。在查看字节码时，发现在构造方法中有一个字节码指令&lt;code>aload_0&lt;/code>，不知道是做什么的，于是就查了一下百度，看到这样一条信息：&lt;/p>
+&lt;blockquote>
+&lt;p>总结起来：在非静态方法中， aload_0 表示对this的操作，在static 方法中，aload_0表示对方法的第一参数的操作。&lt;/p>
+&lt;/blockquote>
+&lt;p>尝试编写如下代码，并编译到字节码查看：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">f1&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">Integer&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">Integer&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Integer&lt;/span> &lt;span class="n">_c&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Integer&lt;/span> &lt;span class="n">_d&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">f2&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">Integer&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">_c&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Integer&lt;/span> &lt;span class="n">_d&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">f3&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">Integer&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Example&lt;/span> &lt;span class="n">_e&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">this&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">_c&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Integer&lt;/span> &lt;span class="n">_d&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">b&lt;/span>&lt;span class="o">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">$&lt;/span> &lt;span class="n">javap&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="n">c&lt;/span> &lt;span class="n">Example&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">java&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">Compiled&lt;/span> &lt;span class="n">from&lt;/span> &lt;span class="s">&amp;#34;Example.java&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Example&lt;/span>&lt;span class="o">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Code&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">0&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">invokespecial&lt;/span> &lt;span class="err">#&lt;/span>&lt;span class="n">1&lt;/span> &lt;span class="c1">// Method java/lang/Object.&amp;#34;&amp;lt;init&amp;gt;&amp;#34;:()V
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">4&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">f1&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">Integer&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">Integer&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Code&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">0&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">astore_2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">2&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">3&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">astore_3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">4&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kd">static&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">f2&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">Integer&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Code&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">0&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">iload_0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">istore_2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">2&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">3&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">astore_3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">4&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">public&lt;/span> &lt;span class="kt">void&lt;/span> &lt;span class="nf">f3&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="kt">int&lt;/span>&lt;span class="o">,&lt;/span> &lt;span class="n">java&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">lang&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="na">Integer&lt;/span>&lt;span class="o">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Code&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">0&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_0&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">1&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">astore_3&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">2&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">iload_1&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">3&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">istore&lt;/span> &lt;span class="n">4&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">5&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">aload_2&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">6&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="n">astore&lt;/span> &lt;span class="n">5&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">8&lt;/span>&lt;span class="o">:&lt;/span> &lt;span class="k">return&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里总共写了3个方法，前两个是静态方法，第三个是非静态方法。参数上面，分别使用了基本类型和引用类型进行对照。&lt;/p>
+&lt;p>现在来看字节码的情况，首先方法&lt;code>f1&lt;/code>中，果然出现了&lt;code>aload_0&lt;/code>代表第一个参数，但是在方法&lt;code>f2&lt;/code>中，就不是&lt;code>aload_0&lt;/code>了，而是&lt;code>iload_0&lt;/code>，所以&lt;code>aload_0&lt;/code>应该是加载第一个引用类型的变量。然后继续看非静态方法&lt;code>f3&lt;/code>，可以看到，虽然在Java代码中它的第一个参数是基本类型，但是第一行指令任然是&lt;code>aload_0&lt;/code>，而第一个参数&lt;code>int&lt;/code>类型使用的指令却是&lt;code>iload_1&lt;/code>，不是从0开始，而是从1开始了。所以结论就很明显了，*load_*是加载指令，其中load前面的代表变量的类型，而load后面的代表参数位置，但是非静态方法比较特殊。这个时候，要是以前的我呀，多半会去死记硬背了：”非静态方法的第一个参数是从1开始“。&lt;/p>
+&lt;p>但是，恰好最近学了Rust，又恰好，其中有一部分概念比较相似，所以我们可以用更加理解的方式，去学习。看如下代码：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-rust" data-lang="rust">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">A&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">impl&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">A&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">f1&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">f2&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="k">fn&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">{&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="kd">let&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">A&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="c1">// a.f1(); //error: this is an associated function, not a method
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">f2&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">A&lt;/span>::&lt;span class="n">f1&lt;/span>&lt;span class="p">();&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="n">A&lt;/span>::&lt;span class="n">f2&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">);&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>把&lt;code>struct A&lt;/code>当作Java中的类，&lt;code>main&lt;/code>方法中，&lt;code>let a = A();&lt;/code>就相当于Java中&lt;code>new&lt;/code>一个实例对象出来。&lt;/p>
+&lt;p>回到文章，第二部分讲的是关于java嵌套类的隐藏开销，如下代码：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-java" data-lang="java">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Outer.java
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kd">public&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">Outer&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kd">private&lt;/span> &lt;span class="kd">class&lt;/span> &lt;span class="nc">Example&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description><category domain="https://umaYnit.github.io/posts/">posts</category><category domain="https://umaYnit.github.io/tags/rust/">Rust</category><category domain="https://umaYnit.github.io/tags/java/">Java</category></item><item><title>Hello World</title><link>https://umaYnit.github.io/posts/hello-world/</link><guid isPermaLink="true">https://umaYnit.github.io/posts/hello-world/</guid><pubDate>Sun, 22 Mar 2020 17:22:55 +0800</pubDate><author>umasensei@gmail.com (uma)</author><copyright>[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh)</copyright><description>&lt;p>又开始尝试写博客了。以前也尝试过很多次，从wordpress到hexo再到现在使用的hugo，折腾这个还是花了不少时间，然而每次都只写了一个Hello World，说到底还是没有写博客、日志之类的习惯。&lt;/p>
+&lt;p>这次又尝试搭建博客，自己还是想有一个地方，可以记录技术、心得、或是生活。&lt;/p>
+&lt;p>本次起意是在周三的时候，想解决docker多阶段构建时，产生的none镜像的问题（见此处）。当时按自己的思路写了一个shell脚本，后来过了一会儿的时候，发现了shell命令的新用法，遂简化了一部分，再后来无意间发现了更方便地写法，就有一个递进的优化过程，因为自己学习了新知识，新思路。于是想将思考过程记录下来，就产生了写博客的想法，不过最终还是只是像平常一样，将结果记录在了onenote上。&lt;/p>
+&lt;p>周六的时候，发现了一个非常棒的编程练习网站，虽然以前也经常看到有讲，在leetcode之类的网站上面刷题什么的，也有去尝试过，但是那些网站更多的是算法相关的,比较难的题目，写起来没有太多感觉。而这个网站，更多的是针对语言特性练习，界面也非常的简洁大方，能做什么，怎样做也是一目了然，引导机制十分完善。我选的练习是kotlin（恋恋不忘），题目也是一些比如全字母句之类的。自己靠着蛮力判断完情况后，发现有一个社区解答，看完之后，哇，居然还能这么用？不愧是kotlin，真的牛皮，想记录感悟，于是就产生了确实需要写博客这个想法。&lt;/p>
+&lt;p>说起来，关于本次搭建博客，有一个感悟的地方，关于可选择性。&lt;/p>
+&lt;p>想到要搭建博客，于是搜索引擎走起，一眼过去，各种各样的，很多。什么动态博客呀、静态博客呀，wordpress、hexo、hugo、jekyll等，光博客框架就很多。随便打开一个框架后，发现，什么主题呀、模块呀、配置呀。我的天，可研究配置的地方更是多得不得了，眼花缭乱，让我这个选择困难加拖延症无从下手。在浪费了n个小时的时间，逛了很多网站，看了很多主题，模板，插件后，终于回想起来，我好像离最初的目标越来越远了。最后&lt;/p>
+&lt;p>自己目前的困难点只在于写作，写作这件事本身和markdown语法。&lt;/p></description><category domain="https://umaYnit.github.io/posts/">posts</category></item></channel></rss>
